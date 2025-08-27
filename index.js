@@ -15,10 +15,6 @@ app.use(express.json());
 app.use("/auth", authRouter);
 app.use("/api/places", placesRouter);
 
-router.get("/search", async (req, res) => {
-  console.log("Request received:", req.query.query);
-});
-
 app.listen(3000, "0.0.0.0", () => {
   console.log(`server running on port ${PORT}`);
 });
