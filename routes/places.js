@@ -4,6 +4,7 @@ import axios from "axios";
 const router = express.Router();
 
 router.get("/search", async (req, res) => {
+  console.log("Request received:", req.query.query);
   const { query } = req.query;
   const apiKey = process.env.GOOGLE_PLACE_KEY;
 
