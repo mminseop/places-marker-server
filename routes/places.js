@@ -7,21 +7,19 @@ router.get("/search", async (req, res) => {
   console.log("Request received:", req.query.query);
   const { query } = req.query;
   const apiKey = process.env.GOOGLE_PLACE_KEY;
+  console.log("api Key:", apiKey);
 
   try {
-    const response = await axios.get(
+    console.log("query:", query);
+    const res = await axios.get(
       `https://maps.googleapis.com/maps/api/place/textsearch/json`,
-      {
-        params: {
-          query: query,
-          key: apiKey,
-        },
-      }
+      { params: { query, key: apiKey } }
     );
-    res.json(response.data);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "api 호출 에러" });
+    console.log("google aip res:", res.data);
+    res.json(res.data);
+  } catch (e) {
+    console.eor("Google API call failed:", e.response?.data || err.message);
+    res.status(500).json({ error: "API 호출 에러" });
   }
 });
 
