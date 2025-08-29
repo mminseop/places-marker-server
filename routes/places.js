@@ -92,3 +92,20 @@ router.post("/save", async (req, res) => {
 });
 
 export default router;
+
+// db 저장된 장소 get
+router.get("/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const [data] = await db.execute(
+      "SELECT id, placeId, placeName, placeAddress, lat, lng FROM Places WHERE userId = ?",
+      [userId]
+    );
+    res.json(data);
+  } catch (e) {
+    console.log("DB 조회 에러", e);
+    res.status(500).json({
+      error: "DB 조회 에러",
+    });
+  }
+});
