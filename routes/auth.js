@@ -16,7 +16,8 @@ router.post("/register", async (req, res) => {
       "SELECT id FROM Users WHERE userEmail = ?",
       [userEmail]
     );
-    if (existing.length) return res.status(409).json({ message: "EMAIL_TAKEN" });
+    if (existing.length)
+      return res.status(409).json({ message: "이메일 중복 에러" });
 
     // 비밀번호 해시
     const hash = await bcrypt.hash(userPassword, 12);
@@ -27,10 +28,10 @@ router.post("/register", async (req, res) => {
       [userEmail, hash, userName, userPhone]
     );
 
-    res.json({ message: "REGISTER_OK" });
+    res.json({ message: "success" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "SERVER_ERROR" });
+    res.status(500).json({ message: "서버 에러" });
   }
 });
 
@@ -39,15 +40,14 @@ router.post("/login", async (req, res) => {
   const { userEmail, userPassword } = req.body;
 
   try {
-    const [rows] = await pool.query(
-      "SELECT * FROM Users WHERE userEmail = ?",
-      [userEmail]
-    );
-    if (!rows.length) return res.status(401).json({ message: "INVALID_CREDENTIALS" });
+    const [rows] = await pool.query("SELECT * FROM Users WHERE userEmail = ?", [
+      userEmail,
+    ]);
+    if (!rows.length) return res.status(401).json({ message: "로그인 실패" });
 
     const user = rows[0];
     const isValid = await bcrypt.compare(userPassword, user.userPassword);
-    if (!isValid) return res.status(401).json({ message: "INVALID_CREDENTIALS" });
+    if (!isValid) return res.status(401).json({ message: "로그인 실패" });
 
     // JWT 토큰 발급
     const token = jwt.sign(
@@ -57,15 +57,14 @@ router.post("/login", async (req, res) => {
     );
 
     // 로그인 날짜 갱신
-    await pool.query(
-      "UPDATE Users SET lastLoginDate = NOW() WHERE id = ?",
-      [user.id]
-    );
+    await pool.query("UPDATE Users SET lastLoginDate = NOW() WHERE id = ?", [
+      user.id,
+    ]);
 
     res.json({ accessToken: token });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "SERVER_ERROR" });
+    res.status(500).json({ message: "서버 에러" });
   }
 });
 
