@@ -77,11 +77,11 @@ router.post("/save", async (req, res) => {
       placeAddress,
       lat,
       lng,
-      rating,
-      userRatingsTotal,
-      priceLevel,
-      openingNow,
-      JSON.stringify(photos || []),
+      rating ?? null,
+      userRatingsTotal ?? null,
+      priceLevel ?? null,
+      openingNow ?? null,
+      photos ? JSON.stringify(photos) : null,
     ]);
 
     res.json({ success: true, insertId: result.insertId });
