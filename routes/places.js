@@ -20,7 +20,16 @@ router.get("/search", async (req, res) => {
         },
       }
     );
-    const data = response.data;
+    const data = response.data.results.map((place) => {
+      //   주소 가공: "대한민국 서울특별시 성동구 마조로1길 2" → "서울 성동구 마조로1길 2"
+      const addressParts = place.formatted_address.split(" ");
+      const shortAddress = addressParts.slice(1).join(" "); // 맨 앞 대한민국 제거
+
+      return {
+        ...place,
+        formatted_address: shortAddress,
+      };
+    });
     console.log(data);
     res.json(data);
   } catch (e) {
