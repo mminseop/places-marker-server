@@ -21,8 +21,9 @@ router.get("/search", async (req, res) => {
       }
     );
 
-    // 상세주소 가공
-    const data = response.data.results.map((place) => {
+    const rawResults = response.data.results || []; // undefined 대비(항상 데이터가 있을순 없음)
+
+    const data = rawResults.map((place) => {
       let shortAddress = "";
 
       if (place.formatted_address) {
@@ -35,7 +36,7 @@ router.get("/search", async (req, res) => {
         formatted_address: shortAddress || "주소 정보 없음",
       };
     });
-    
+
     console.log(data);
     res.json(data);
   } catch (e) {
