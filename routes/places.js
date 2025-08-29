@@ -20,16 +20,22 @@ router.get("/search", async (req, res) => {
         },
       }
     );
+
+    // 상세주소 가공
     const data = response.data.results.map((place) => {
-      //   주소 가공: "대한민국 서울특별시 성동구 마조로1길 2" → "서울 성동구 마조로1길 2"
-      const addressParts = place.formatted_address.split(" ");
-      const shortAddress = addressParts.slice(1).join(" "); // 맨 앞 대한민국 제거
+      let shortAddress = "";
+
+      if (place.formatted_address) {
+        const addressParts = place.formatted_address.split(" ");
+        shortAddress = addressParts.slice(1).join(" "); // 맨 앞 '대한민국' 제거
+      }
 
       return {
         ...place,
-        formatted_address: shortAddress,
+        formatted_address: shortAddress || "주소 정보 없음",
       };
     });
+    
     console.log(data);
     res.json(data);
   } catch (e) {
