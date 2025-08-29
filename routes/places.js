@@ -20,8 +20,9 @@ router.get("/search", async (req, res) => {
         },
       }
     );
-
-    res.json(response.data);
+    const data = response.data;
+    console.log(data);
+    res.json(data);
   } catch (e) {
     console.error("Google API fail : ", e.response.data ?? e.message);
     res.status(500).json({ error: "API 호출 에러" });
