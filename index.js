@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import authRouter from "./routes/auth.js";
 import placesRouter from "./routes/places.js";
+
 dotenv.config();
 
 const app = express();
