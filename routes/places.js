@@ -1,5 +1,6 @@
 import express from "express";
 import axios from "axios";
+import { db } from "../db";
 
 const router = express.Router();
 
@@ -47,7 +48,7 @@ router.get("/search", async (req, res) => {
 });
 
 // 장소 등록 api
-router.post("/", async (req, res) => {
+router.post("/save", async (req, res) => {
   const {
     userId,
     placeId,
