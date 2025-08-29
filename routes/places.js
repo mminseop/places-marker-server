@@ -15,7 +15,8 @@ router.get("/search", async (req, res) => {
           query,
           key: apiKey,
           language: "ko", // 한국어로 결과 받기
-          region: "KR",   // 한국 지역 우선
+          location: "37.5665,126.9780", // 서울 시청 위도,경도
+          radius: 40000, // 반경 (미터) - 40km
         },
       }
     );
