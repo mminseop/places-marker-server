@@ -3,6 +3,7 @@ import axios from "axios";
 
 const router = express.Router();
 
+// 장소 검색 api
 router.get("/search", async (req, res) => {
   const { query } = req.query;
   const apiKey = process.env.GOOGLE_PLACE_KEY;
@@ -16,7 +17,7 @@ router.get("/search", async (req, res) => {
           key: apiKey,
           language: "ko", // 한국어로 결과 받기
           location: "37.5665,126.9780", // 서울 시청 위도,경도
-          radius: 40000, // 반경 (미터) - 40km
+          radius: 40000, // 반경(미터) - 40km
         },
       }
     );
@@ -28,7 +29,7 @@ router.get("/search", async (req, res) => {
 
       if (place.formatted_address) {
         const addressParts = place.formatted_address.split(" ");
-        shortAddress = addressParts.slice(1).join(" "); // 맨 앞 '대한민국' 제거
+        shortAddress = addressParts.slice(1).join(" "); // 맨 앞 대한민국 제거
       }
 
       return {
@@ -42,6 +43,50 @@ router.get("/search", async (req, res) => {
   } catch (e) {
     console.error("Google API fail : ", e.response.data ?? e.message);
     res.status(500).json({ error: "API 호출 에러" });
+  }
+});
+
+// 장소 등록 api
+router.post("/", async (req, res) => {
+  const {
+    userId,
+    placeId,
+    placeName,
+    placeAddress,
+    lat,
+    lng,
+    rating,
+    userRatingsTotal,
+    priceLevel,
+    openingNow,
+    photos,
+  } = req.body;
+
+  try {
+    const query = `
+      INSERT INTO Places
+      (userId, placeId, placeName, placeAddress, lat, lng, rating, userRatingsTotal, priceLevel, openingNow, photos)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const [result] = await db.execute(query, [
+      userId,
+      placeId,
+      placeName,
+      placeAddress,
+      lat,
+      lng,
+      rating,
+      userRatingsTotal,
+      priceLevel,
+      openingNow,
+      JSON.stringify(photos || []),
+    ]);
+
+    res.json({ success: true, insertId: result.insertId });
+  } catch (e) {
+    console.error("DB 등록 에러:", e);
+    res.status(500).json({ error: "DB 저장 실패" });
   }
 });
 
