@@ -91,8 +91,6 @@ router.post("/save", async (req, res) => {
   }
 });
 
-export default router;
-
 // db 저장된 장소 get
 router.get("/:userId", async (req, res) => {
   try {
@@ -109,3 +107,5 @@ router.get("/:userId", async (req, res) => {
     });
   }
 });
+
+export default router;
