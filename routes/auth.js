@@ -62,11 +62,11 @@ router.post("/login", async (req, res) => {
       user.id,
     ]);
 
-    res.json({ 
-  accessToken: token,
-  userId: user.id,
-  userEmail: user.userEmail
-});
+    res.json({
+      accessToken: token,
+      userId: user.id,
+      userEmail: user.userEmail,
+    });
   } catch (err) {
     console.error("로그인 에러:", err);
     res.status(500).json({ message: "서버 에러" });
