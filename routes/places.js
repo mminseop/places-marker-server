@@ -64,9 +64,8 @@ router.get("/search", async (req, res) => {
 });
 
 // 장소 등록 api
-router.post("/save", async (req, res) => {
+router.post("/save", authenticateToken, async (req, res) => {
   const {
-    userId,
     placeId,
     placeName,
     placeAddress,
@@ -80,6 +79,8 @@ router.post("/save", async (req, res) => {
   } = req.body;
 
   try {
+    const userId = req.user.userId;
+    
     const query = `
       INSERT INTO Places
       (userId, placeId, placeName, placeAddress, lat, lng, rating, userRatingsTotal, priceLevel, openingNow, photos)
@@ -116,7 +117,6 @@ router.get("/saved", authenticateToken, async (req, res) => {
       "SELECT id, placeId, placeName, placeAddress, lat, lng FROM Places WHERE userId = ?",
       [userId]
     );
-    console.log("DB 조회 결과:", rows);
     res.json(rows);
   } catch (e) {
     console.log("DB 조회 에러", e);
