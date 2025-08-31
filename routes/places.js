@@ -9,8 +9,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // 로그인 유저 인증 미들웨어
 const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
   if (!token) return res.sendStatus(401);
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
@@ -112,12 +112,12 @@ router.get("/saved", authenticateToken, async (req, res) => {
   try {
     const { userId } = req.user;
     console.log(userId);
-    const [data] = await db.execute(
+    const [rows] = await db.execute(
       "SELECT id, placeId, placeName, placeAddress, lat, lng FROM Places WHERE userId = ?",
       [userId]
     );
-    console.log("db 조회 결과:", data);
-    res.json(data);
+    console.log("DB 조회 결과:", rows);
+    res.json(rows);
   } catch (e) {
     console.log("DB 조회 에러", e);
     res.status(500).json({
