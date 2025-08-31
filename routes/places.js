@@ -111,12 +111,13 @@ router.post("/save", async (req, res) => {
 // db 저장된 장소 get
 router.get("/saved", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.userId; // JWT payload에서 userId
+    const { userId } = req.user;
     console.log(userId);
     const [data] = await db.execute(
       "SELECT id, placeId, placeName, placeAddress, lat, lng FROM Places WHERE userId = ?",
       [userId]
     );
+    console.log("db 조회 결과:", data);
     res.json(data);
   } catch (e) {
     console.log("DB 조회 에러", e);
