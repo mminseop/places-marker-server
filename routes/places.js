@@ -15,6 +15,7 @@ const authenticateToken = (req, res, next) => {
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) return res.sendStatus(403);
+    console.log("디코딩된 JWT:", decoded);
     req.user = decoded; // sub = userId, userEmail
     next();
   });
