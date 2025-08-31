@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // 라우터
-app.use("/auth", authRouter);
+app.use("/api/auth", authRouter);
 app.use("/api/places", placesRouter);
 
 app.listen(3000, "0.0.0.0", () => {
