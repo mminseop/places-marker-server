@@ -42,13 +42,14 @@ router.post("/login", async (req, res) => {
 
   try {
     // 유저 조회
-    const [rows] = await db.execute(
-      "SELECT * FROM Users WHERE userEmail = ?",
-      [userEmail]
-    );
+    const [rows] = await db.execute("SELECT * FROM Users WHERE userEmail = ?", [
+      userEmail,
+    ]);
 
     if (!rows.length) {
-      return res.status(401).json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." });
+      return res
+        .status(401)
+        .json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." });
     }
 
     const user = rows[0];
@@ -56,7 +57,9 @@ router.post("/login", async (req, res) => {
     // 2. 비밀번호 검증
     const isValid = await bcrypt.compare(userPassword, user.userPassword);
     if (!isValid) {
-      return res.status(401).json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." });
+      return res
+        .status(401)
+        .json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." });
     }
 
     // 3. JWT 발급
@@ -67,7 +70,9 @@ router.post("/login", async (req, res) => {
     );
 
     // 마지막 로그인 날짜 업데이트
-    await db.execute("UPDATE Users SET lastLoginDate = NOW() WHERE id = ?", [user.id]);
+    await db.execute("UPDATE Users SET lastLoginDate = NOW() WHERE id = ?", [
+      user.id,
+    ]);
 
     // 5. 응답
     res.json({
