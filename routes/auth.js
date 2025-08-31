@@ -46,13 +46,13 @@ router.post("/login", async (req, res) => {
     ]);
     if (!rows.length) return res.status(401).json({ message: "로그인 실패" });
 
-    const user = rows[0];
+    const userRow = rows[0];
     const isValid = await bcrypt.compare(userPassword, user.userPassword);
     if (!isValid) return res.status(401).json({ message: "로그인 실패" });
 
     // JWT 토큰 발급
     const token = jwt.sign(
-      { sub: user.id, userEmail: user.userEmail },
+      { userId: userRow.id, userEmail: userRow.userEmail },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -64,7 +64,7 @@ router.post("/login", async (req, res) => {
 
     res.json({
       accessToken: token,
-      userId: user.id,
+      userId: userRow.id,
       userEmail: user.userEmail,
     });
   } catch (err) {
