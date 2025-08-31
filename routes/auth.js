@@ -6,20 +6,6 @@ import db from "../db.js";
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 
-
-// 인증 미들웨어
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) return res.sendStatus(403);
-    req.user = decoded; // sub = userId, userEmail
-    next();
-  });
-};
-
 // 회원가입
 router.post("/register", async (req, res) => {
   const { userEmail, userPassword, userName, userPhone } = req.body;

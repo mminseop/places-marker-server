@@ -5,6 +5,8 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
+const JWT_SECRET = process.env.JWT_SECRET
+
 // 로그인 유저 인증 미들웨어
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -106,7 +108,7 @@ router.post("/save", async (req, res) => {
 });
 
 // db 저장된 장소 get
-router.get("/saved", async (req, res) => {
+router.get("/saved", authenticateToken, async (req, res) => {
   try {
     const { userId } = req.user.sub; // JWT payload에서 userId
     const [data] = await db.execute(
