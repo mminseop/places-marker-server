@@ -1,8 +1,22 @@
 import express from "express";
 import axios from "axios";
 import db from "../db.js";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
+
+// 로그인 유저 인증 미들웨어
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) return res.sendStatus(403);
+    req.user = decoded; // sub = userId, userEmail
+    next();
+  });
+};
 
 // 장소 검색 api
 router.get("/search", async (req, res) => {
@@ -92,9 +106,9 @@ router.post("/save", async (req, res) => {
 });
 
 // db 저장된 장소 get
-router.get("/:userId", async (req, res) => {
+router.get("/saved", async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.user.sub; // JWT payload에서 userId
     const [data] = await db.execute(
       "SELECT id, placeId, placeName, placeAddress, lat, lng FROM Places WHERE userId = ?",
       [userId]
