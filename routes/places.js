@@ -10,12 +10,15 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // 로그인 유저 인증 미들웨어
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
+  console.log("Authorization Header:", authHeader);
   const token = authHeader && authHeader.split(" ")[1];
+  console.log("Parsed Token:", token);
   if (!token) return res.sendStatus(401);
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) return res.sendStatus(403);
-    console.log("디코딩된 JWT:", decoded);
+    console.log("JWT Verify Error:", err.message);
+    console.log("JWT Decoded Payload:", decoded);
     req.user = decoded; // sub = userId, userEmail
     next();
   });
