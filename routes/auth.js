@@ -37,6 +37,7 @@ router.post("/register", async (req, res) => {
 
 // 로그인
 router.post("/login", async (req, res) => {
+  console.log("로그인 요청:", req.body);
   const { userEmail, userPassword } = req.body;
 
   try {
