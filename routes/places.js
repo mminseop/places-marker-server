@@ -81,11 +81,12 @@ router.post("/save", authenticateToken, async (req, res) => {
       photos,
     } = req.body;
 
-    // photos를 URL 배열로 변환 (문자열이면 JSON.parse)
+    // 이미지 url 저장
     const photoUrls = Array.isArray(photos)
-      ? photos // 이미 배열이면 그대로
-      : typeof photos === "string"
-      ? JSON.parse(photos)
+      ? photos.map(
+          (ref) =>
+            `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${ref}&key=${process.env.GOOGLE_PLACE_KEY}`
+        )
       : [];
 
     const query = `
