@@ -82,15 +82,9 @@ router.post("/save", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
 
-    // photos를 URL 배열로 변환
     const photoUrls = Array.isArray(photos)
-      ? photos
-          .map((p) =>
-            p.photo_reference
-              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${p.photo_reference}&key=${process.env.GOOGLE_PLACE_KEY}`
-              : null
-          )
-          .filter(Boolean)
+      ? // 이미 URL 배열이면 그대로 사용
+        photos
       : [];
 
     const query = `
