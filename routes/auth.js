@@ -76,8 +76,8 @@ router.post("/login", async (req, res) => {
       res,
       {
         accessToken: token,
-        userId: user.id,
-        userEmail: user.userEmail,
+        // userId: user.id,
+        // userEmail: user.userEmail,
       },
       "로그인 성공"
     );
