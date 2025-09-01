@@ -18,7 +18,7 @@ router.post("/register", async (req, res) => {
       [userEmail]
     );
     if (existingUser.length) {
-      return sendError(res, "이미 존재하는 이메일입니다.", 409);
+      return sendError(res, "이미 존재하는 이메일입니다.");
     }
 
     // 비밀번호 해시
@@ -33,7 +33,7 @@ router.post("/register", async (req, res) => {
     return sendSuccess(res, null, "회원가입 성공");
   } catch (err) {
     console.error("회원가입 에러:", err);
-    return sendError(res, "서버 에러", 500);
+    return sendError(res, "서버 에러");
   }
 });
 
@@ -48,7 +48,7 @@ router.post("/login", async (req, res) => {
     ]);
 
     if (!rows.length) {
-      return sendError(res, "이메일 또는 비밀번호가 올바르지 않습니다.", 401);
+      return sendError(res, "이메일 또는 비밀번호가 올바르지 않습니다.");
     }
 
     const user = rows[0];
@@ -56,7 +56,7 @@ router.post("/login", async (req, res) => {
     // 비밀번호 검증
     const isValid = await bcrypt.compare(userPassword, user.userPassword);
     if (!isValid) {
-      return sendError(res, "이메일 또는 비밀번호가 올바르지 않습니다.", 401);
+      return sendError(res, "이메일 또는 비밀번호가 올바르지 않습니다.");
     }
 
     // JWT 발급
@@ -83,7 +83,32 @@ router.post("/login", async (req, res) => {
     );
   } catch (err) {
     console.error("로그인 에러:", err);
-    return sendError(res, "서버 에러", 500);
+    return sendError(res, "서버 에러");
+  }
+});
+
+// 이메일 중복 확인
+router.post("/checkemail", async (req, res) => {
+  const { userEmail } = req.body;
+
+  if (!userEmail) {
+    return sendFail(res, "이메일을 입력해주세요.");
+  }
+
+  try {
+    const [check] = await db.execute(
+      "SELECT id FROM Users WHERE userEmail = ?",
+      [userEmail]
+    );
+
+    if (check.length > 0) {
+      return sendSuccess(res, { data: "이미 사용 중인 이메일입니다." });
+    }
+
+    return sendSuccess(res, { data: "사용 가능한 이메일입니다." });
+  } catch (err) {
+    console.error("이메일 중복 확인 에러:", err);
+    return sendFail(res, "서버 에러");
   }
 });
 
