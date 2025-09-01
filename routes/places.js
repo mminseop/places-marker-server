@@ -2,6 +2,7 @@ import express from "express";
 import axios from "axios";
 import db from "../db.js";
 import jwt from "jsonwebtoken";
+import { sendFail, sendSuccess } from "../utils/res.js";
 
 const router = express.Router();
 
@@ -11,10 +12,10 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  if (!token) return res.sendStatus(401);
+  if (!token) return sendFail(res, "토큰 없음");
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) return res.sendStatus(403);
+    if (err) return sendFail(res, "유효하지 않은 토큰");
     req.user = decoded;
     next();
   });
@@ -39,7 +40,7 @@ router.get("/search", async (req, res) => {
       }
     );
 
-    const rawResults = response.data.results || []; // undefined 대비(항상 데이터가 있을순 없음)
+    const rawResults = response.data.results || []; // 데이터 없을때 대비
 
     const data = rawResults.map((place) => {
       let shortAddress = "";
@@ -55,11 +56,10 @@ router.get("/search", async (req, res) => {
       };
     });
 
-    console.log(data);
-    res.json(data);
+    return sendSuccess(res, data);
   } catch (e) {
-    console.error("Google API fail : ", e.response.data ?? e.message);
-    res.status(500).json({ error: "API 호출 에러" });
+    console.error("Google API fail : ", e.response?.data ?? e.message);
+    return sendFail(res, "Google API 호출 에러");
   }
 });
 
@@ -80,7 +80,7 @@ router.post("/save", authenticateToken, async (req, res) => {
 
   try {
     const userId = req.user.userId;
-    
+
     const query = `
       INSERT INTO Places
       (userId, placeId, placeName, placeAddress, lat, lng, rating, userRatingsTotal, priceLevel, openingNow, photos)
@@ -101,10 +101,10 @@ router.post("/save", authenticateToken, async (req, res) => {
       photos ? JSON.stringify(photos) : null,
     ]);
 
-    res.json({ success: true, insertId: result.insertId });
+    return sendSuccess(res, { insertId: result.insertId });
   } catch (e) {
     console.error("DB 등록 에러:", e);
-    res.status(500).json({ error: "DB 저장 실패" });
+    return sendFail(res, "DB 저장 실패");
   }
 });
 
@@ -112,17 +112,15 @@ router.post("/save", authenticateToken, async (req, res) => {
 router.get("/saved", authenticateToken, async (req, res) => {
   try {
     const { userId } = req.user;
-    console.log(userId);
     const [rows] = await db.execute(
       "SELECT id, placeId, placeName, placeAddress, lat, lng FROM Places WHERE userId = ?",
       [userId]
     );
-    res.json(rows);
+
+    return sendSuccess(res, rows);
   } catch (e) {
-    console.log("DB 조회 에러", e);
-    res.status(500).json({
-      error: "DB 조회 에러",
-    });
+    console.error("DB 조회 에러", e);
+    return sendFail(res, "DB 조회 에러");
   }
 });
 
