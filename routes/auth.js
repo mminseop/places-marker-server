@@ -18,7 +18,7 @@ router.post("/register", async (req, res) => {
       [userEmail]
     );
     if (existingUser.length) {
-      return res.status(409).json({ message: "이미 존재하는 이메일입니다." });
+      return sendError(res, "이미 존재하는 이메일입니다.", 409);
     }
 
     // 비밀번호 해시
@@ -30,10 +30,10 @@ router.post("/register", async (req, res) => {
       [userEmail, hashedPassword, userName, userPhone]
     );
 
-    res.json({ message: "회원가입 성공" });
+    return sendSuccess(res, null, "회원가입 성공");
   } catch (err) {
     console.error("회원가입 에러:", err);
-    res.status(500).json({ message: "서버 에러" });
+    return sendError(res, "서버 에러", 500);
   }
 });
 
@@ -48,22 +48,18 @@ router.post("/login", async (req, res) => {
     ]);
 
     if (!rows.length) {
-      return res
-        .status(401)
-        .json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." });
+      return sendError(res, "이메일 또는 비밀번호가 올바르지 않습니다.", 401);
     }
 
     const user = rows[0];
 
-    // 2. 비밀번호 검증
+    // 비밀번호 검증
     const isValid = await bcrypt.compare(userPassword, user.userPassword);
     if (!isValid) {
-      return res
-        .status(401)
-        .json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." });
+      return sendError(res, "이메일 또는 비밀번호가 올바르지 않습니다.", 401);
     }
 
-    // 3. JWT 발급
+    // JWT 발급
     const token = jwt.sign(
       { userId: user.id, userEmail: user.userEmail },
       JWT_SECRET,
@@ -75,15 +71,19 @@ router.post("/login", async (req, res) => {
       user.id,
     ]);
 
-    // 5. 응답
-    res.json({
-      accessToken: token,
-      userId: user.id,
-      userEmail: user.userEmail,
-    });
+    // 응답
+    return sendSuccess(
+      res,
+      {
+        accessToken: token,
+        userId: user.id,
+        userEmail: user.userEmail,
+      },
+      "로그인 성공"
+    );
   } catch (err) {
     console.error("로그인 에러:", err);
-    res.status(500).json({ message: "서버 에러" });
+    return sendError(res, "서버 에러", 500);
   }
 });
 
