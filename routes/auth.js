@@ -102,10 +102,10 @@ router.post("/checkemail", async (req, res) => {
     );
 
     if (check.length > 0) {
-      return sendSuccess(res, { data: "이미 사용 중인 이메일입니다." });
+      return sendSuccess(res, "이미 사용 중인 이메일입니다.");
     }
 
-    return sendSuccess(res, { data: "사용 가능한 이메일입니다." });
+    return sendSuccess(res, "사용 가능한 이메일입니다.");
   } catch (err) {
     console.error("이메일 중복 확인 에러:", err);
     return sendFail(res, "서버 에러");
