@@ -113,7 +113,7 @@ router.get("/saved", authenticateToken, async (req, res) => {
   try {
     const { userId } = req.user;
     const [rows] = await db.execute(
-      "SELECT id, placeId, placeName, placeAddress, lat, lng FROM Places WHERE userId = ?",
+      "SELECT * FROM Places WHERE userId = ?",
       [userId]
     );
 
