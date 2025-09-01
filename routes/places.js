@@ -65,26 +65,27 @@ router.get("/search", async (req, res) => {
 
 // 장소 등록 api
 router.post("/save", authenticateToken, async (req, res) => {
-  console.log("req.body.photos:", photos);
-  const {
-    placeId,
-    placeName,
-    placeAddress,
-    lat,
-    lng,
-    rating,
-    userRatingsTotal,
-    priceLevel,
-    openingNow,
-    photos,
-  } = req.body;
-
   try {
     const userId = req.user.userId;
 
+    const {
+      placeId,
+      placeName,
+      placeAddress,
+      lat,
+      lng,
+      rating,
+      userRatingsTotal,
+      priceLevel,
+      openingNow,
+      photos,
+    } = req.body;
+
+    // photos를 URL 배열로 변환 (문자열이면 JSON.parse)
     const photoUrls = Array.isArray(photos)
-      ? // 이미 URL 배열이면 그대로 사용
-        photos
+      ? photos // 이미 배열이면 그대로
+      : typeof photos === "string"
+      ? JSON.parse(photos)
       : [];
 
     const query = `
@@ -104,7 +105,7 @@ router.post("/save", authenticateToken, async (req, res) => {
       userRatingsTotal ?? null,
       priceLevel ?? null,
       openingNow ?? null,
-      photoUrls ? JSON.stringify(photoUrls) : null,
+      photoUrls.length ? JSON.stringify(photoUrls) : null,
     ]);
 
     return sendSuccess(res, { insertId: result.insertId });
