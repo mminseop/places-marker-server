@@ -65,6 +65,7 @@ router.get("/search", async (req, res) => {
 
 // 장소 등록 api
 router.post("/save", authenticateToken, async (req, res) => {
+  console.log("req.body.photos:", photos);
   const {
     placeId,
     placeName,
@@ -83,13 +84,15 @@ router.post("/save", authenticateToken, async (req, res) => {
 
     // photos를 URL 배열로 변환
     const photoUrls = Array.isArray(photos)
-      ? photos.map((p) =>
-          p.photo_reference
-            ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${p.photo_reference}&key=${process.env.GOOGLE_PLACE_KEY}`
-            : null
-        ).filter(Boolean)
+      ? photos
+          .map((p) =>
+            p.photo_reference
+              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${p.photo_reference}&key=${process.env.GOOGLE_PLACE_KEY}`
+              : null
+          )
+          .filter(Boolean)
       : [];
-      
+
     const query = `
       INSERT INTO Places
       (userId, placeId, placeName, placeAddress, lat, lng, rating, userRatingsTotal, priceLevel, openingNow, photos)
@@ -121,10 +124,9 @@ router.post("/save", authenticateToken, async (req, res) => {
 router.get("/saved", authenticateToken, async (req, res) => {
   try {
     const { userId } = req.user;
-    const [rows] = await db.execute(
-      "SELECT * FROM Places WHERE userId = ?",
-      [userId]
-    );
+    const [rows] = await db.execute("SELECT * FROM Places WHERE userId = ?", [
+      userId,
+    ]);
 
     return sendSuccess(res, rows);
   } catch (e) {
