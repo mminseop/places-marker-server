@@ -1,25 +1,10 @@
 import express from "express";
 import axios from "axios";
 import db from "../db.js";
-import jwt from "jsonwebtoken";
 import { sendFail, sendSuccess } from "../utils/res.js";
+import { authenticateToken } from "../middlewares/auth.js";
 
 const router = express.Router();
-
-const JWT_SECRET = process.env.JWT_SECRET;
-
-// 로그인 유저 인증 미들웨어
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (!token) return sendFail(res, "토큰 없음");
-
-  jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) return sendFail(res, "유효하지 않은 토큰");
-    req.user = decoded;
-    next();
-  });
-};
 
 // 장소 검색 api
 router.get("/search", async (req, res) => {

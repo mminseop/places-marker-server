@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import db from "../db.js";
 import { sendFail, sendSuccess } from "../utils/res.js";
-import axios from "axios";
+import { authenticateToken } from "../middlewares/auth.js";
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -32,8 +32,8 @@ router.post("/register", async (req, res) => {
     );
 
     return sendSuccess(res, null, "회원가입 성공");
-  } catch (err) {
-    console.error("회원가입 에러:", err);
+  } catch (e) {
+    console.error("회원가입 에러:", e);
     return sendError(res, "서버 에러");
   }
 });
@@ -82,8 +82,8 @@ router.post("/login", async (req, res) => {
       },
       "로그인 성공"
     );
-  } catch (err) {
-    console.error("로그인 에러:", err);
+  } catch (e) {
+    console.error("로그인 에러:", e);
     return sendError(res, "서버 에러");
   }
 });
@@ -107,8 +107,29 @@ router.post("/checkemail", async (req, res) => {
     }
 
     return sendSuccess(res, "사용 가능한 이메일입니다.");
-  } catch (err) {
-    console.error("이메일 중복 확인 에러:", err);
+  } catch (e) {
+    console.error("이메일 중복 확인 에러:", e);
+    return sendFail(res, "서버 에러");
+  }
+});
+
+// 유저 정보 조회
+router.get("/me", authenticateToken, async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    const [rows] = await db.execute(
+      "SELECT id, userEmail, userName, userPhone, lastLoginDate FROM Users WHERE id = ?",
+      [userId]
+    );
+
+    if (!rows.length) {
+      return sendFail(res, "유저를 찾을 수 없습니다.");
+    }
+
+    return sendSuccess(res, rows[0]);
+  } catch (e) {
+    console.error("유저정보 조회 에러:", e);
     return sendFail(res, "서버 에러");
   }
 });
