@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import db from "../db.js";
 import { sendFail, sendSuccess } from "../utils/res.js";
+import axios from "axios";
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
