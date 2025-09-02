@@ -3,7 +3,6 @@ import axios from "axios";
 import db from "../db.js";
 import { sendFail, sendSuccess } from "../utils/res.js";
 import { authenticateToken } from "../middlewares/auth.js";
-import { authenticateToken } from "../middlewares/auth.js";
 
 const router = express.Router();
 
@@ -132,7 +131,7 @@ router.delete("/delete/:id", authenticateToken, async (req, res) => {
     if (result.affectedRows > 0) {
       return sendSuccess(res, null, "삭제 성공");
     } else {
-      return sendFail(res, "삭제 실패: 해당 장소 없음");
+      return sendFail(res, "삭제 실패, 해당 장소 없음");
     }
   } catch (err) {
     console.error(err);
