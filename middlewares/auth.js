@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { sendFail } from "../utils/res";
+import { sendFail } from "../utils/res.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
