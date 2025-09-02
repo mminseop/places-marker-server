@@ -3,6 +3,7 @@ import axios from "axios";
 import db from "../db.js";
 import { sendFail, sendSuccess } from "../utils/res.js";
 import { authenticateToken } from "../middlewares/auth.js";
+import { authenticateToken } from "../middlewares/auth.js";
 
 const router = express.Router();
 
@@ -113,6 +114,29 @@ router.get("/saved", authenticateToken, async (req, res) => {
   } catch (e) {
     console.error("DB 조회 에러", e);
     return sendFail(res, "DB 조회 에러");
+  }
+});
+
+
+// 장소 삭제
+router.delete("/delete/:id", authenticateToken, async (req, res) => {
+  const placeId = req.params.id;
+  const userId = req.user.userId; // 인증 미들웨어에서 추출
+
+  try {
+    const [result] = await db.execute(
+      "DELETE FROM Places WHERE id = ? AND userId = ?",
+      [placeId, userId]
+    );
+
+    if (result.affectedRows > 0) {
+      return sendSuccess(res, null, "삭제 성공");
+    } else {
+      return sendFail(res, "삭제 실패: 해당 장소 없음");
+    }
+  } catch (err) {
+    console.error(err);
+    return sendFail(res, "서버 에러");
   }
 });
 
