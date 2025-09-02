@@ -114,7 +114,7 @@ router.post("/checkemail", async (req, res) => {
 });
 
 // 유저 정보 조회
-router.get("/me", authenticateToken, async (req, res) => {
+router.get("/userinfo", authenticateToken, async (req, res) => {
   try {
     const { userId } = req.user;
 

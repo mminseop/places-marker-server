@@ -32,7 +32,6 @@ app.use(
   })
 );
 
-
 app.use(express.json());
 
 // 라우터
