@@ -134,4 +134,33 @@ router.get("/userinfo", authenticateToken, async (req, res) => {
   }
 });
 
+// 기본정보 수정 (이름, 휴대폰)
+router.put("/update", authenticateToken, async (req, res) => {
+  const { userName, userPhone } = req.body;
+  const { userId } = req.user;
+
+  if (!userName || !userPhone) {
+    return sendFail(res, "이름과 휴대폰 번호를 모두 입력해주세요.");
+  }
+
+  try {
+    // DB 업데이트
+    await db.execute(
+      "UPDATE Users SET userName = ?, userPhone = ? WHERE id = ?",
+      [userName, userPhone, userId]
+    );
+
+    // 업데이트된 정보 반환
+    const [updatedRows] = await db.execute(
+      "SELECT id, userEmail, userName, userPhone, lastLoginDate FROM Users WHERE id = ?",
+      [userId]
+    );
+
+    return sendSuccess(res, updatedRows[0], "기본정보가 업데이트완료");
+  } catch (e) {
+    console.error("기본정보 수정 에러:", e);
+    return sendFail(res, "서버 에러");
+  }
+});
+
 export default router;
